@@ -127,3 +127,16 @@ After the collection process, I had X number of data points. I then preprocessed
 I finally randomly shuffled the data set and put Y% of the data into a validation set. 
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+
+
+
+###### Notes ######
+
+* the car should stay in the center of the road as much as possible
+* if the car veers off to the side, it should recover back to center
+* driving counter-clockwise can help the model generalize
+* flipping the images is a quick way to augment the data
+* collecting data from the second track can also help generalize the model
+* we want to avoid overfitting or underfitting when training the model
+* knowing when to stop collecting more data
