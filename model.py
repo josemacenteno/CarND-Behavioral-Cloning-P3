@@ -5,6 +5,8 @@ import numpy as np
 import tensorflow as tf
 import sklearn
 import random
+from keras.models import Model
+import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
@@ -42,7 +44,8 @@ def generator(samples, batch_size=32):
                 filename = batch_sample[0].split('/')[-1]
                 name = "udacity_data/IMG/" + filename
                 center_image = cv2.imread(name)
-                center_angle = float(batch_sample[3])
+                noise_factor = random.uniform(0.96, 1.04)
+                center_angle = noise_factor * float(batch_sample[3])
                 if not flip:
                     images.append(center_image)
                     angles.append(center_angle)
@@ -71,21 +74,31 @@ print(sample_instance[0].shape)
 # Preprocess incoming data, centered around zero with small standard deviation
 model = Sequential()
  
-model.add(Cropping2D(cropping=((50,20), (0,0)),
+model.add(Cropping2D(cropping=((40,10), (0,0)),
                      input_shape=sample_instance[0].shape[1:]))
 model.add(Lambda(lambda x: (x / 255.0) - 0.5))
-model.add(Convolution2D(16, 5, 5))
+model.add(Convolution2D(24, 5, 5))
 model.add(MaxPooling2D((2, 2)))
 model.add(Dropout(0.6))
-model.add(Convolution2D(32, 10, 10))
+model.add(Convolution2D(36, 5, 5))
 model.add(MaxPooling2D((2, 2)))
 model.add(Dropout(0.6))
-model.add(Activation('relu'))
+model.add(Convolution2D(48, 5, 5))
+model.add(MaxPooling2D((2, 2)))
+model.add(Dropout(0.6))
+model.add(Convolution2D(64, 3, 3))
+model.add(MaxPooling2D((2, 2)))
+model.add(Dropout(0.6))
 model.add(Flatten())
-model.add(Dense(240))
+model.add(Dense(100))
 model.add(Activation('relu'))
-model.add(Dense(84))
+model.add(Dropout(0.6))
+model.add(Dense(50))
 model.add(Activation('relu'))
+model.add(Dropout(0.6))
+model.add(Dense(10))
+model.add(Activation('relu'))
+model.add(Dropout(0.6))
 model.add(Dense(1))
  
 model.compile(loss = 'mse', optimizer= 'adam')
@@ -96,15 +109,32 @@ model.compile(loss = 'mse', optimizer= 'adam')
 #           nb_epoch=2)
 
 
-model.fit_generator(train_generator, 
-                    samples_per_epoch = 2*len(train_samples),
+history_object = model.fit_generator(train_generator, 
+                    samples_per_epoch = len(train_samples),
                     validation_data = validation_generator,
-                    nb_val_samples = 2*len(validation_samples),
-                    nb_epoch = 20,
+                    nb_val_samples = len(validation_samples),
+                    nb_epoch = 5,
                     verbose = 1)
 
 
 print("saving model")
 model.save('model.h5')
 
+
+### print the keys contained in the history object
+print(history_object.history.keys())
+
+### plot the training and validation loss for each epoch
+plt.plot(history_object.history['loss'])
+plt.plot(history_object.history['val_loss'])
+plt.title('model mean squared error loss')
+plt.ylabel('mean squared error loss')
+plt.xlabel('epoch')
+plt.legend(['training set', 'validation set'], loc='upper right')
+plt.show()
+
+
+
 print("Done")
+
+
