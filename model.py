@@ -21,8 +21,14 @@ from keras.layers.pooling import MaxPooling2D
 
 DEV = False
 MAX_SHIFT = 30
-keep_prob = 0.3
+#Based on visual inspection, for angles of 0.1 the center of the car moves about 60 pixels to the left
+PIXELS_PER_ANGLE = 0.15/60 
+#Side cameras seems to be 40 to 60 pixels shifted
+CORRECTION_FACTOR = 50 * PIXELS_PER_ANGLE
+keep_prob = 1.0
 MAX_NOISE = 0.05
+
+random.seed(1013)
 
 samples = []
 with open("udacity_data/driving_log.csv") as udacity_log:
@@ -52,9 +58,9 @@ def generator(samples, batch_size=32):
                 if image_orientation == CENTER:
                     angle_correction = 0.0
                 elif image_orientation == LEFT:
-                    angle_correction = 0.15
-                else:
-                    angle_correction = -0.15
+                    angle_correction = CORRECTION_FACTOR
+                elif image_orientation == RIGHT:
+                    angle_correction = -CORRECTION_FACTOR
 
 
                 filename = batch_sample[image_orientation].split('/')[-1]
@@ -66,7 +72,7 @@ def generator(samples, batch_size=32):
                     rows,cols = train_image.shape[0:2]
                     M = np.float32([[1,0,shift_factor],[0,1,0]])
                     train_image = cv2.warpAffine(train_image,M,(cols,rows))
-                    angle_correction += shift_factor/1000
+                    angle_correction += shift_factor * PIXELS_PER_ANGLE
                 center_angle = noise_factor * (float(batch_sample[3]) + angle_correction)
                 if not flip:
                     images.append(train_image)
@@ -102,56 +108,59 @@ model.add(Lambda(lambda x: (x / 128.0) - 1.0))
 if DEV:
     model.add(Flatten())
 else:
-    model.add(Convolution2D(24, 5, 5))
+    model.add(Convolution2D(24, 5, 5), 'relu')
     model.add(MaxPooling2D((2, 2)))
     model.add(Dropout(keep_prob))
-    model.add(Convolution2D(48, 5, 5))
+    model.add(Convolution2D(36, 5, 5), 'relu')
     model.add(MaxPooling2D((2, 2)))
     model.add(Dropout(keep_prob))
-    model.add(Convolution2D(64, 5, 5))
-    model.add(MaxPooling2D((2, 2)))
+    model.add(Convolution2D(48, 5, 5), 'relu')
+    model.add(MaxPooling2D((2, 2)), 'relu')
     model.add(Dropout(keep_prob))
-    model.add(Convolution2D(128, 3, 3))
-    model.add(MaxPooling2D((2, 2)))
+    model.add(Convolution2D(64, 3, 3), 'relu')
+    model.add(Dropout(keep_prob))
+    model.add(Convolution2D(64, 3, 3), 'relu')
     model.add(Dropout(keep_prob))
     model.add(Flatten())
-    model.add(Dense(150))
-    model.add(Activation('relu'))
+    model.add(Dense(100), 'relu')
     model.add(Dropout(keep_prob))
-    model.add(Dense(75))
-    model.add(Activation('relu'))
+    model.add(Dense(50), 'relu')
     model.add(Dropout(keep_prob))
-    model.add(Dense(20))
-    model.add(Activation('relu'))
+    model.add(Dense(10), 'relu')
     model.add(Dropout(keep_prob))
 model.add(Dense(1))
  
 model.compile(loss = 'mse', optimizer= 'adam')
 
+if DEV:
+    num_epochs = 2
+else:
+    num_epochs = 10
 
-history_object = model.fit_generator(train_generator, 
-                    samples_per_epoch = len(train_samples),  
-                    validation_data = validation_generator,
-                    nb_val_samples = len(validation_samples),
-                    nb_epoch = 5,
-                    verbose = 1)
+for i in range(num_epochs):
+    model.fit_generator(train_generator, 
+                        samples_per_epoch = len(train_samples),  
+                        validation_data = validation_generator,
+                        nb_val_samples = len(validation_samples),
+                        nb_epoch = 1,
+                        verbose = 1)
 
 
-print("saving model")
-model.save('model.h5')
+    print("saving model for epoch:", i)
+    model.save('model_epoch' + str(i) + '.h5')
 
 
-### print the keys contained in the history object
-print(history_object.history.keys())
+# ### print the keys contained in the history object
+# print(history_object.history.keys())
 
-### plot the training and validation loss for each epoch
-plt.plot(history_object.history['loss'])
-plt.plot(history_object.history['val_loss'])
-plt.title('model mean squared error loss')
-plt.ylabel('mean squared error loss')
-plt.xlabel('epoch')
-plt.legend(['training set', 'validation set'], loc='upper right')
-plt.show()
+# ### plot the training and validation loss for each epoch
+# plt.plot(history_object.history['loss'])
+# plt.plot(history_object.history['val_loss'])
+# plt.title('model mean squared error loss')
+# plt.ylabel('mean squared error loss')
+# plt.xlabel('epoch')
+# plt.legend(['training set', 'validation set'], loc='upper right')
+# plt.show()
 
 
 
