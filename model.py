@@ -20,7 +20,7 @@ from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
 
 DEV = False
-MAX_SHIFT = 30
+MAX_SHIFT = 20
 #Based on visual inspection, for angles of 0.1 the center of the car moves about 60 pixels to the left
 PIXELS_PER_ANGLE = 0.15/60 
 #Side cameras seems to be 40 to 60 pixels shifted
@@ -122,6 +122,8 @@ else:
     model.add(Convolution2D(64, 3, 3, activation = 'relu'))
     model.add(Dropout(keep_prob))
     model.add(Flatten())
+    model.add(Dense(1164, activation = 'relu'))
+    model.add(Dropout(keep_prob))
     model.add(Dense(100, activation = 'relu'))
     model.add(Dropout(keep_prob))
     model.add(Dense(50, activation = 'relu'))
