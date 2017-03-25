@@ -102,7 +102,7 @@ print(sample_instance[0].shape)
 # Preprocess incoming data, centered around zero with small standard deviation
 model = Sequential()
  
-model.add(Cropping2D(cropping=((40,10), (MAX_SHIFT,MAX_SHIFT)),
+model.add(Cropping2D(cropping=((25,15), (MAX_SHIFT,MAX_SHIFT)),
                      input_shape=sample_instance[0].shape[1:]))
 model.add(Lambda(lambda x: (x / 128.0) - 1.0))
 if DEV:
