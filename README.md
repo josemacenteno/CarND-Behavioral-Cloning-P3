@@ -27,11 +27,11 @@ The goals / steps of this project are the following:
 ####1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
-* [model.py] (https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/model.py) containing the script to create and train the model
-* [drive.py] (https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/drive.py) for driving the car in autonomous mode
+* [model.py](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/model.py) containing the script to create and train the model
+* [drive.py](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/drive.py) for driving the car in autonomous mode
 * [get_model_weights.sh](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/get_model_weights.sh) A script to download the [model.h5](https://www.dropbox.com/s/oplczho6myqqul1/model.h5) file containing a trained convolution neural network from a [Dropbox link] (https://www.dropbox.com/s/oplczho6myqqul1/model.h5)
-* [README.md] summarizing the results
-* [video.mp4] (https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/video.mp4) is a short video to show how the model performs in the simulator running in Autonomous mode. The lap is recorded using the lowest graphics settings on an intel core i5 system.
+* [README.md](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/README.md) summarizing the results
+* [video.mp4](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/video.mp4) is a short video to show how the model performs in the simulator running in Autonomous mode. The lap is recorded using the lowest graphics settings on an intel core i5 system.
 
 
 ####2. Submission includes functional code
