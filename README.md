@@ -48,55 +48,64 @@ The model.py file contains the code for training and saving the convolution neur
 
 #### 1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network, where the architecture has been copied from a paper published by NVIDIA and suggested by the Udacity instrucitons.
+My model consists of a neural network, where the architecture has been copied from a paper published by [NVIDIA](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/) and showcased in a video lecture from Udacity. In short it is a series of 5 Convolutional Neural Network layers followed by 4 fully connected layers and final neuron to produce the angle. 
 
-I included RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+I selected RELU activation functions on each Convolution@D or Dense layers to introduce nonlinearity (code lines 163-185),  the data is normalized in the model using a Keras lambda layer (code line 160) and cropped with another kearas fucntion Cropping2D (code line 157). 
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+I included dropout layers in order to reduce overfitting, but the experiments showed that using dropout, even at keep probability of 0.8 hurt the performance in the simulator, so I ended up training without really using the Dropout technique. (model.py line 33)
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting (code lines 61, 143 and 144). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 #### 3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model uses an adam optimizer, so the learning rate was not tuned manually (model.py line 189).
+
+I tried a bunch of loss functions I found in the Keras documentation for the model.compile object. Nothing performed better than the mean square error originally sugested by Udacity lectures, so I kept it.  
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+Training data was leveraged from a training set provided by Udacity. I planned to add recovery recordings as needed, but the set provided turned out to be sufficient when combined with other data augementation techniques.  The Udacity data set includes midle lane driving laps going backwards mainly. It comes with side camera records too, which was leveraged for data augmentation and calibration. 
 
-For details about how I created the training data, see the next section. 
+For details about how I augmented the training data, see the next section. 
 
 ### Model Architecture and Training Strategy
 
 #### 1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to try LeNet and the NVIDIA paper first. The NVIDIA architecture was able to complete a lap on its own, without overfitting after 10 epochs of trainning. LeNet on the other hand showed erratic behavior and failed after the first bridge in the required track. The final submission uses the larger model from the NVIDIA paper, as it proved to have superior performance.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. Training on LeNet set a loss metric of 0.5 as a benchmark on how well the model was being optimized. After switching to the NVIDIA model I saw loss go down to 0.03 consistently and sometimes up to 0.013. The car did not complete laps at that stage though.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+After augmenting the data set I saw various techniques get the train and validation loss metrics down to 0.0098.
 
-To combat the overfitting, I modified the model so that ...
-
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. The secret sauce was simply to augment the data, specially reducing 0 angle instances.
 
 #### 2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+The details of the NVIDIA architecture used can be observed in model,py (code lines 162-187) and in the following table:
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+| Layer         		|     Description	        					|
+|:---------------------:|:---------------------------------------------:| 
+| Convolution | 5x5 patch, 24 filters, ReLU activation function	|
+| Max pooling	     | 2x2 stride |
+| Convolution | 5x5 patch, 36 filters, ReLU activation function	|
+| Max pooling	     | 2x2 stride |
+| Convolution | 5x5 patch, 48 filters, ReLU activation function	|
+| Max pooling	     | 2x2 stride |
+| Convolution | 3x3 patch, 64 filters, ReLU activation function	|
+| Convolution | 3x3 patch, 64 filters, ReLU activation function	|
+| Flatten() | Converts CNN outputs into a linear array for DNN	|
+| Fully connected		| Flat input, 1164 output features			|
+| Fully connected		| Flat input, 100 output features			|
+| Fully connected		| Flat input, 50 output features			|
+| Fully connected		| Flat input, 10 output features			|
+| Regression			| 1 linear neuron |
 
-![alt text][image1]
+####3. Augmentation of the Training Set & Training Process
 
-####3. Creation of the Training Set & Training Process
-
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I first used Udacity's data for center lane driving. Here is an example image of center lane driving:
 
 ![alt text][image2]
 
