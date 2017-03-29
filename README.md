@@ -50,7 +50,7 @@ The model.py file contains the code for training and saving the convolution neur
 
 My model consists of a neural network, where the architecture has been copied from a paper published by [NVIDIA](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/) and showcased in a video lecture from Udacity. In short it is a series of 5 Convolutional Neural Network layers followed by 4 fully connected layers and final neuron to produce the angle. 
 
-I selected RELU activation functions on each Convolution@D or Dense layers to introduce nonlinearity (code lines 163-185),  the data is normalized in the model using a Keras lambda layer (code line 160) and cropped with another kearas fucntion Cropping2D (code line 157). 
+I selected RELU activation functions on each Convolution2D or Dense layers to introduce nonlinearity (code lines 163-185),  the data is normalized in the model using a Keras lambda layer (code line 160) and cropped with another kearas fucntion Cropping2D (code line 157). 
 
 #### 2. Attempts to reduce overfitting in the model
 
@@ -78,9 +78,9 @@ The overall strategy for deriving a model architecture was to try LeNet and the 
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. Training on LeNet set a loss metric of 0.5 as a benchmark on how well the model was being optimized. After switching to the NVIDIA model I saw loss go down to 0.03 consistently and sometimes up to 0.013. The car did not complete laps at that stage though.
 
-After augmenting the data set I saw various techniques get the train and validation loss metrics down to 0.0098.
+After augmenting the data set I saw various techniques get the train and validation loss metrics down to 0.0098. The secret sauce was simply to augment the data, specially reducing 0 angle instances.
 
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. The secret sauce was simply to augment the data, specially reducing 0 angle instances.
+At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. 
 
 #### 2. Final Model Architecture
 
@@ -115,18 +115,16 @@ I then recorded the vehicle recovering from the left side and right sides of the
 ![alt text][image4]
 ![alt text][image5]
 
-Then I repeated this process on track two in order to get more data points.
+At this point data is split into train and validation sets. This helps us evaluate train augmentaed data, but keep a validation loss metric based purely on observed behavior.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+To augment the data set, I flipped images and angles thinking that this would balance the training between right and left turning.
 
-![alt text][image6]
-![alt text][image7]
+When looking at thte training data it is clear thet most of the recorded behavior correspongs to a 0.0 degree steering angle. This causes concern for overfitting the model into a car that avoids turning as much as possible. To diversify this training points an image translation that shifts the image horizontally was implemented. Using function "cv2.warpAffine" a trainning image with a very small steering angle is shifted to the right or left at random by 0 to 20 pixels. Careful comparison of larger steering angle images led me to believe that every 60 pixels there needs to be a steering angle between 0.1 and 0.15 towards the center to make the car get back into te center. This 0.15 degress per 60 pixels is used to adjust steering angles for shifted images.
 
-Etc ....
+The next obvious augmentation is to use the side camera images recorded. After carefully comparing a center camera image and a side comera image, the side camera is similar to the center image shifted by 40 to 60 pixels. When using a side camera image the angle is adjusted to account for a 50 pixel shift. The camera to be used is uniformily randomized to select between CENTER, LEFT or RIGHT cameras.
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+Finally a non-intuitive way to augment the data and reduce overfitting is include some noise on the steering angle itself. This technique was has been used by other Udacity students, notably @aflippo proposed it in a Slack discusion. The idea is that given a any frame, there is more than one angle which can be considered as correct behavior. In reality there is a whole range of angles which could be considered a good response to a given frame from the camera. By multiplying the steering angle from the training set by a number between 0.95 and 1.05 we consider any angle within 5% of the training recording to be a good response. This augments the training data by an infinite number of overlapping training points. 
 
+Finally every image is preprocessed by cropping irrelevant sky, car hood and border pixels. This is accomplished by using a Keras function and it is built into the tensor model itself. The data is also normalized to fall in a [-1,1] range and be center around 0 on every given image.
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 4 as evidenced by multiple runs of up to 20 epochs, where the validation loss stops decreasing constantly after epoch 5. Evethough the validation accuracy is not decreasing, I observed some epoch 8 or 9 models performing better, so I left the code to run 10 epochs by default. 
