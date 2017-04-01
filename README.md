@@ -12,11 +12,11 @@ The goals / steps of this project are the following:
 
 [center]: ./data_analysis/image_0p0_center_2016_12_01_13_33_31_113.jpg "center camera, steering angle 0"
 [hist]: ./data_analysis/train_hist.png "Train steering angle histogram"
-[shift_example]: ./data_analysis/placeholder_small.png "Recovery Image"
 [left_side]: ./data_analysis/image_0p0_left_2016_12_01_13_33_31_113.jpg "left camera, steering angle 0"
 [right_side]: ./data_analysis/image_0p0_right_2016_12_01_13_33_31_113.jpg "right camera, steering angle 0"
-[center_1p0]: ./examples/placeholder_small.png "Normal Image angle 1.0"
-[flip_1p0]: ./examples/placeholder_small.png "Flipped Image angle -1.0"
+[center_0p1]: ./examples/image_0p1_angle_center_2016_12_01_13_33_27_772.jpg "Normal Image angle 0.1"
+[flip_0p1]: ./data_analysis/flip.png "Flipped Image angle -1.0"
+[shift_example]: ./data_analysis/translated.png "Flipped Image angle -1.0"
 
 ## Rubric Points ##
 Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
