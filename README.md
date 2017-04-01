@@ -132,8 +132,8 @@ Then, I used side camera images. Everytime a side camera image is used, the corr
 
 To augment the data set, I flipped images and angles thinking that this would balance the training between right and left turning.
 
-![alt text][center_1p0]
-![alt text][flip_1p0]
+![alt text][center_0p1]
+![alt text][flip_0p1]
 
 When looking at thte training data it is clear thet most of the recorded behavior correspongs to a 0.0 degree steering angle. This causes concern for overfitting the model into a car that avoids turning as much as possible. To diversify this training points an image translation that shifts the image horizontally was implemented. Using function "cv2.warpAffine" a trainning image with a very small steering angle is shifted to the right or left at random by 0 to 20 pixels. Careful comparison of larger steering angle images led me to believe that every 60 pixels there needs to be a steering angle between 0.1 and 0.15 towards the center to make the car get back into te center. This 0.15 degress per 60 pixels is used to adjust steering angles for shifted images.
 
