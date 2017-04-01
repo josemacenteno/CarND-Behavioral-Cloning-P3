@@ -11,7 +11,7 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [center]: ./data_analysis/image_0p0_center_2016_12_01_13_33_31_113.jpg "center camera, steering angle 0"
-[hist]: ./data_analysis/placeholder.png "Grayscaling"
+[hist]: ./data_analysis/train_hist.png "Train steering angle histogram"
 [shift_example]: ./data_analysis/placeholder_small.png "Recovery Image"
 [left_side]: ./data_analysis/image_0p0_left_2016_12_01_13_33_31_113.jpg "left camera, steering angle 0"
 [right_side]: ./data_analysis/image_0p0_right_2016_12_01_13_33_31_113.jpg "right camera, steering angle 0"
