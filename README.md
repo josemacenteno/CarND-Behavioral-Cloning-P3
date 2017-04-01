@@ -108,7 +108,7 @@ The details of the NVIDIA architecture used can be observed in model,py (code li
 | Fully connected		| Flat input, 10 output features			|
 | Regression			| 1 linear neuron |
 
-####3. Augmentation of the Training Set & Training Process
+#### 3. Augmentation of the Training Set & Training Process
 
 To capture good driving behavior, I first used Udacity's data for center lane driving. Here is an example image of center lane driving:
 
@@ -120,12 +120,12 @@ Then I realized there were too many training instances with angle 0. Here is a h
 
 ![alt text][hist]
 
-To diversify the training set more I shifted images when the car is centered correctly and trained with a small angle, which would compensate for the car not being as well centered as in the original image. Here is an example of a shifted image:
+To diversify the training set more I shifted images when the car is centered correctly and trained with a small angle, which would compensate for the car not being as well centered as in the original image. Careful comparison of larger steering angle images led me to believe that every 60 pixels there needs to be a steering angle between 0.1 and 0.15 towards the center to make the car get back into te center. This 0.15 degress per 60 pixels is used to adjust steering angles for shifted images. Here is an example of a shifted image:
 
 ![alt text][shift_example]
 
 
-Then, I used side camera images. Everytime a side camera image is used, the corresponsing steering angle is modified by a fixed CORRECTION_FACTOR in the direction we want the car to take. Here are examples of side camera images:
+Then, I used side camera images. Everytime a side camera image is used, the corresponsing steering angle is modified by a fixed CORRECTION_FACTOR in the direction we want the car to take. After carefully comparing a center camera image and a side comera image, the side camera is similar to the center image shifted by 40 to 60 pixels.  Here are examples of side camera images:
 
 ![alt text][left_side]
 ![alt text][right_side]
@@ -135,12 +135,12 @@ To augment the data set, I flipped images and angles thinking that this would ba
 ![alt text][center_0p1]
 ![alt text][flip_0p1]
 
-When looking at thte training data it is clear thet most of the recorded behavior correspongs to a 0.0 degree steering angle. This causes concern for overfitting the model into a car that avoids turning as much as possible. To diversify this training points an image translation that shifts the image horizontally was implemented. Using function "cv2.warpAffine" a trainning image with a very small steering angle is shifted to the right or left at random by 0 to 20 pixels. Careful comparison of larger steering angle images led me to believe that every 60 pixels there needs to be a steering angle between 0.1 and 0.15 towards the center to make the car get back into te center. This 0.15 degress per 60 pixels is used to adjust steering angles for shifted images.
-
-The next obvious augmentation is to use the side camera images recorded. After carefully comparing a center camera image and a side comera image, the side camera is similar to the center image shifted by 40 to 60 pixels. When using a side camera image the angle is adjusted to account for a 50 pixel shift. The camera to be used is uniformily randomized to select between CENTER, LEFT or RIGHT cameras.
 
 Finally a non-intuitive way to augment the data and reduce overfitting is include some noise on the steering angle itself. This technique was has been used by other Udacity students, notably @aflippo proposed it in a Slack discusion. The idea is that given a any frame, there is more than one angle which can be considered as correct behavior. In reality there is a whole range of angles which could be considered a good response to a given frame from the camera. By multiplying the steering angle from the training set by a number between 0.95 and 1.05 we consider any angle within 5% of the training recording to be a good response. This augments the training data by an infinite number of overlapping training points. 
 
-Finally every image is preprocessed by cropping irrelevant sky, car hood and border pixels. This is accomplished by using a Keras function and it is built into the tensor model itself. The data is also normalized to fall in a [-1,1] range and be center around 0 on every given image.
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 4 as evidenced by multiple runs of up to 20 epochs, where the validation loss stops decreasing constantly after epoch 5. Evethough the validation accuracy is not decreasing, I observed some epoch 8 or 9 models performing better, so I left the code to run 10 epochs by default. 
+To make the training go faster and converge....
+
+Every image is preprocessed by cropping irrelevant sky, car hood and border pixels. This is accomplished by using a Keras function and it is built into the tensor model itself. The data is also normalized to fall in a [-1,1] range and be center around 0 on every given image.
+
+In the end, after using all of the data uagmentation techniques described.. the model does not overfit, and it is able to complete a full track as you can observe in the [video](https://github.com/josemacenteno/CarND-Behavioral-Cloning-P3/blob/master/video.mp4)
