@@ -128,13 +128,10 @@ To diversify the training set more I shifted images when the car is centered cor
 Then, I used side camera images. Everytime a side camera image is used, the corresponsing steering angle is modified by a fixed CORRECTION_FACTOR in the direction we want the car to take. Here are examples of side camera images:
 
 ![alt text][left_side]
-![alt text][center]
 ![alt text][right_side]
 
-
-
-
 To augment the data set, I flipped images and angles thinking that this would balance the training between right and left turning.
+
 ![alt text][center_1p0]
 ![alt text][flip_1p0]
 
