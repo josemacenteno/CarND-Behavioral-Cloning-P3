@@ -1,7 +1,7 @@
 **Behavioral Cloning Project**
 
 The goals / steps of this project are the following:
-1. Use a simulator to collect data of good driving behavior
+1. Gather data from a simulator to model good driving behavior
 1. Build, a convolution neural network in Keras that predicts steering angles from images
 1. Train and validate the model with a training and validation set
 1. Test that the model successfully drives around track one without leaving the road
