@@ -48,27 +48,32 @@ The model.py file contains the code for training and saving the convolution neur
 
 #### 1. An appropriate model architecture has been employed
 
-My model consists of a neural network, where the architecture has been copied from a paper published by [NVIDIA](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/) and showcased in a video lecture from Udacity. In short it is a series of 5 Convolutional Neural Network layers followed by 4 fully connected layers and final neuron to produce the angle. 
+My model consists of a neural network, where the architecture has been copied from a paper published by [NVIDIA](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/) and showcased in a video lecture from Udacity. In short it is a series of 5 Convolutional Neural Network layers, followed by 4 fully connected layers, plus a final neuron to produce the angle. 
 
-I selected RELU activation functions on each Convolution2D or Dense layers to introduce nonlinearity (code lines 163-185),  the data is normalized in the model using a Keras lambda layer (code line 160) and cropped with another kearas fucntion Cropping2D (code line 157). 
+I selected RELU activation functions on each Convolution2D or Dense layer to introduce nonlinearity (code lines 163-185),  the data is normalized in the model using a Keras lambda layer (code line 160) and cropped with another kearas fucntion Cropping2D (code line 157). 
 
 #### 2. Attempts to reduce overfitting in the model
+The model was trained and validated on different data sets to identify when the model might be overfitting (code lines 61, 143 and 144). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-I included dropout layers in order to reduce overfitting, but the experiments showed that using dropout, even at keep probability of 0.8 hurt the performance in the simulator, so I ended up training without really using the Dropout technique. (model.py line 33)
+Data is augmented, which helps to capture the true nature of the problem beyond a few laps of recordings. WHen the model trains, it needs to capture the complexity of all the augmented possibilities used, not just a few thousand images. Augmenting the data is the most important factor to avoid overfitting in my solution.
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code lines 61, 143 and 144). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+Dropout was considered but not exercised. My experiments showed that using dropout, even with a high keep probability of 0.8, hurts the performance in the simulator. I ended up training without really using the Dropout technique. (model.py line 33). My conclusion about Dropout not helping is that I am already using a small model to capture the complexity of all the augmented data I am using. Perhaps a larger model will see better results from Dropout, but not the NVIDIA model with so much data augmentation in place.
+
 
 #### 3. Model parameter tuning
 
 The model uses an adam optimizer, so the learning rate was not tuned manually (model.py line 189).
 
-I tried a bunch of loss functions I found in the Keras documentation for the model.compile object. Nothing performed better than the mean square error originally sugested by Udacity lectures, so I kept it.  
+I tried a bunch of loss functions from the Keras documentation. Nothing performed better than the original "mean square error", so I kept it.  
+
+I didn't see loss dropping a lot after epoch 8, so I am only training for a total of 10 epochs. 
+
 
 #### 4. Appropriate training data
 
-Training data was leveraged from a training set provided by Udacity. I planned to add recovery recordings as needed, but the set provided turned out to be sufficient when combined with other data augementation techniques.  The Udacity data set includes midle lane driving laps going backwards mainly. It comes with side camera records too, which was leveraged for data augmentation and calibration. 
+Training data was leveraged from a training set provided by Udacity. Udacity gave us a few laps of good driving behavior. The Udacity data set includes midle lane driving laps going backwards mainly. It comes with side camera records too, which was leveraged for data augmentation and calibration. 
 
-For details about how I augmented the training data, see the next section. 
+For details about how I augmented the training data, see the next section. No additional data was necessary, provided data was enough.
 
 ### Model Architecture and Training Strategy
 
@@ -76,9 +81,9 @@ For details about how I augmented the training data, see the next section.
 
 The overall strategy for deriving a model architecture was to try LeNet and the NVIDIA paper first. The NVIDIA architecture was able to complete a lap on its own, without overfitting after 10 epochs of trainning. LeNet on the other hand showed erratic behavior and failed after the first bridge in the required track. The final submission uses the larger model from the NVIDIA paper, as it proved to have superior performance.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. Training on LeNet set a loss metric of 0.5 as a benchmark on how well the model was being optimized. After switching to the NVIDIA model I saw loss go down to 0.03 consistently and sometimes up to 0.013. The car did not complete laps at that stage though.
+In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. Training on LeNet set a benchmark loss of 0.5. After switching to the NVIDIA model I saw loss go down to 0.03 consistently and sometimes up to 0.013. The car did not complete laps at that stage though.
 
-After augmenting the data set I saw various techniques get the train and validation loss metrics down to 0.0098. The secret sauce was simply to augment the data, specially reducing 0 angle instances.
+After augmenting the data set I saw the loss go down to 0.0098. The secret sauce was simply to augment the data, specially reducing 0 angle instances.
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. 
 
@@ -107,13 +112,23 @@ The details of the NVIDIA architecture used can be observed in model,py (code li
 
 To capture good driving behavior, I first used Udacity's data for center lane driving. Here is an example image of center lane driving:
 
-![alt text][image2]
+![alt text][center]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+Then I realized there were too many training instances with angle 0. Here is a histogram of the original steering angles:
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![alt text][hist]
+
+To diversify the training set more I shifted images when the car is centered correctly and trained with a small angle, which would compensate for the car not being as well centered as in the original image. Here is an example of a shifted image:
+
+![alt text][shift_example]
+
+
+Then, I used side camera images. Everytime a side camera image is used, the corresponsing steering angle is modified by a fixed CORRECTION_FACTOR in the direction we want the car to take. Here are examples of side camera images:
+
+![alt text][left_side]
+![alt text][center]
+![alt text][right_side]
+
 
 At this point data is split into train and validation sets. This helps us evaluate train augmentaed data, but keep a validation loss metric based purely on observed behavior.
 
